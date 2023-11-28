@@ -1,3 +1,29 @@
+"""
+
+MIT License
+
+Copyright (c) 2021 Dev Kumar
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+"""
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import logging
@@ -11,10 +37,15 @@ from reminder import check_reminders
 import estimate
 import delete
 import add
+import add_balance
 import budget
 import category
+import download_csv
+import download_pdf
+import email_history
 import add_recurring
 import delete_expense
+import account
 from datetime import datetime
 from jproperties import Properties
 from telebot import types
@@ -47,6 +78,7 @@ bot.set_update_listener(listener)
 
 # Define your list of commands and descriptions
 menu_commands = [
+    ("add_balance", "Add balance to a specific account"),
     ("add", "Record/Add a new spending"),
     ("add_recurring", "Record the recurring expenses"),
     ("display", "Show sum of expenditure"),
@@ -57,7 +89,11 @@ menu_commands = [
     ("edit", "Edit/Change spending details"),
     ("budget", "Add/Update/View/Delete budget"),
     ("category", "Add/Delete/Show custom categories in telegram bot"),
-    ("set_reminder", "Create a reminder for your purchases or bills")
+    ("csv", "To download your history in csv format"),
+    ("pdf", "Generates a PDF file containing the user's expense history plot"),
+    ("email_history", "your spend history will be sent to provided email address"),
+    ("set_reminder", "Create a reminder for your purchases or bills"),
+    ("select_expenses_account", "Select account to use for expenses")
 ]
 
 bot.set_my_commands([
@@ -82,6 +118,8 @@ def handle_menu_command(message):
     command = message.text[1:]  # Remove the '/' character from the command
     if command == "add":
         add.run(message, bot)
+    elif command == "add_balance":
+        add_balance.run(message, bot)
     elif command == "display":
         display.run(message, bot)
     elif command == 'estimate':
@@ -98,6 +136,16 @@ def handle_menu_command(message):
         edit.run(message, bot)
     elif command == 'history':
         history.run(message, bot)
+    elif command == 'category':
+        category.run(message, bot)
+    elif command == 'csv':
+        download_csv.run(message, bot)
+    elif command == 'email_history':
+        email_history.run(message, bot)
+    elif command == 'select_expenses_account':
+        account.run(message, bot)
+    elif command == 'pdf':
+        download_pdf.run(message, bot)
     elif command == 'set_reminder':
         print('Setting reminder')
         reminder.run(message, bot)

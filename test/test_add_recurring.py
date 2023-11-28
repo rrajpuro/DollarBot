@@ -1,3 +1,28 @@
+"""
+
+MIT License
+
+Copyright (c) 2021 Dev Kumar
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+"""
 import os
 import json
 from mock.mock import patch
@@ -59,16 +84,18 @@ def test_post_amount_input_working_withdata(mock_telebot, mocker):
     mc = mock_telebot.return_value
     mc.send_message.return_value = True
     mocker.patch.object(add, 'helper')
-    add.helper.validate_entered_amount.return_value = 10
+    add.helper.validate_entered_amount.return_value = 100
     add.helper.write_json.return_value = True
     add.helper.getDateFormat.return_value = dateFormat
     add.helper.getTimeFormat.return_value = timeFormat
+    add.helper.get_account_type.return_value = "Checking"
+    add.helper.get_account_balance.return_value = 100 
 
     mocker.patch.object(add, 'option')
     add.option.return_value = {11, "here"}
 
     message = create_message("hello from testing!")
-    add.post_amount_input(message, mc, 'Food')
+    add.post_amount_input(message, mc, 'Food','INR')
     assert (mc.send_message.called)
 
 
@@ -80,7 +107,7 @@ def test_post_amount_input_nonworking(mock_telebot, mocker):
     mocker.patch.object(add, 'helper')
     add.helper.validate_entered_amount.return_value = 0
     message = create_message("hello from testing!")
-    add.post_amount_input(message, mc, 'Food')
+    add.post_amount_input(message, mc, 'Food','INR')
     assert (mc.reply_to.called)
 
 
@@ -89,10 +116,12 @@ def test_post_amount_input_working_withdata_chatid(mock_telebot, mocker):
     mc = mock_telebot.return_value
     mc.send_message.return_value = True
     mocker.patch.object(add, 'helper')
-    add.helper.validate_entered_amount.return_value = 10
+    add.helper.validate_entered_amount.return_value = 100
     add.helper.write_json.return_value = True
     add.helper.getDateFormat.return_value = dateFormat
     add.helper.getTimeFormat.return_value = timeFormat
+    add.helper.get_account_type.return_value = "Checking"
+    add.helper.get_account_balance.return_value = 100 
 
     mocker.patch.object(add, 'option')
     add.option = {11, "here"}
@@ -101,7 +130,7 @@ def test_post_amount_input_working_withdata_chatid(mock_telebot, mocker):
     add.option = test_option
 
     message = create_message("hello from testing!")
-    add.post_amount_input(message, mc, 'Food')
+    add.post_amount_input(message, mc, 'Food','INR')
     assert (mc.send_message.called)
     #assert (mc.send_message.called_with(11, ANY))
 

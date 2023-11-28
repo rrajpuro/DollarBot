@@ -1,3 +1,29 @@
+"""
+
+MIT License
+
+Copyright (c) 2021 Dev Kumar
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+"""
+
 from code import budget_update
 import mock
 from mock import ANY
@@ -8,30 +34,31 @@ from telebot import types
 @patch('telebot.telebot')
 def test_run_overall_budget_overall_case(mock_telebot, mocker):
     mc = mock_telebot.return_value
+    reply_message = create_message("USD")
+    mc.reply_to.return_value = reply_message
 
     mocker.patch.object(budget_update, 'helper')
-    budget_update.helper.isOverallBudgetAvailable.return_value = True
+    budget_update.helper.getCurrencies.return_value = ['USD', 'EUR', 'GBP', 'INR', 'JPY']
 
-    budget_update.update_overall_budget = mock.Mock(return_value=True)
     message = create_message("hello from testing")
-    budget_update.run(message, mc)
+    budget_update.update_overall_budget(message, mc)
 
-    assert (budget_update.update_overall_budget.called)
+    mc.reply_to.assert_called_with(message, 'Select Currency', reply_markup=ANY)
 
 
 @patch('telebot.telebot')
 def test_run_overall_budget_category_case(mock_telebot, mocker):
     mc = mock_telebot.return_value
+    reply_message = create_message("Food")
+    mc.reply_to.return_value = reply_message
 
     mocker.patch.object(budget_update, 'helper')
-    budget_update.helper.isOverallBudgetAvailable.return_value = False
-    budget_update.helper.isCategoryBudgetAvailable.return_value = True
+    budget_update.helper.getSpendCategories.return_value = ['Food', 'Groceries', 'Utilities', 'Transport', 'Shopping', 'Miscellaneous']
 
-    budget_update.update_category_budget = mock.Mock(return_value=True)
     message = create_message("hello from testing")
-    budget_update.run(message, mc)
+    budget_update.update_category_budget(message, mc)
 
-    assert (budget_update.update_category_budget.called)
+    mc.reply_to.assert_called_with(message, 'Select Category', reply_markup=ANY)
 
 
 @patch('telebot.telebot')

@@ -1,3 +1,29 @@
+"""
+
+MIT License
+
+Copyright (c) 2021 Dev Kumar
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+"""
+
 import re
 import json
 import os
@@ -7,6 +33,8 @@ with open('variables.json') as variables:
     variables_data = json.load(variables)
 
 spend_categories = variables_data["variables"]["spend_categories"]
+account_categories = variables_data["variables"]["account_categories"]
+currencies = variables_data["variables"]["currencies"]
 choices = variables_data["variables"]["choices"]
 plot = variables_data["variables"]["plot"]
 spend_display_option = variables_data["variables"]["spend_display_option"]
@@ -146,6 +174,37 @@ def isCategoryBudgetByCategoryAvailable(chatId, cat):
         return False
     return cat in data.keys()
 
+# function to check if there's balance in a particular account type
+def isBalanceAvailable(chat_id, cat):
+    data = getUserData(chat_id)
+    if data['balance'][cat] is None:
+        return False
+    else:
+        return data['balance'][cat]
+
+# function to get balance in a particular category account.
+def get_account_balance(message, bot, cat):
+    if isBalanceAvailable(message.chat.id, cat):
+        return float(isBalanceAvailable(message.chat.id, cat))
+    else:
+        return 0
+
+# function to get the current active account for expenses.
+def get_account_type(message):
+    data = getUserData(message.chat.id)
+    if data['account']['Checking'] == "True":
+        return 'Checking'
+    else:
+        return 'Savings'
+
+# function to display balance in a particular category account.
+def display_account_balance(message, bot, cat):
+    chat_id = message.chat.id
+    if get_account_balance(message, bot, cat) != 0:
+        print("Balance in {} account is: {}.".format(cat, float(get_account_balance(message, bot, cat))))
+    else:
+        print("This Account category has no existing balance")
+
 # function to display remaining budget
 def display_remaining_budget(message, bot, cat):
     chat_id = message.chat.id
@@ -215,12 +274,18 @@ def calculate_total_spendings_for_category(queryResult, cat):
 
 # function to get spending categories
 def getSpendCategories():
-    # with open("categories.txt", "r") as tf:
-    #     spend_categories = tf.read().split(',')
+    with open("categories.txt", "r") as tf:
+        spend_categories = tf.read().split(',')
     return spend_categories
 
+def getAccountCategories():
+    return account_categories 
 
-getSpendCategories()
+#function to get different currencies
+def getCurrencies():
+    with open("currencies.txt", "r") as tf:
+        currencies = tf.read().split(',')
+    return currencies
 
 # function to get plot
 def getplot():
